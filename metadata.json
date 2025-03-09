@@ -1,0 +1,20 @@
+{
+    "KPlugin": {
+        "Name": "Liv Tiler",
+        "Description": "A script to tile windows like kwin been doing it for years until 6.3",
+        "Icon": "preferences-system-windows",
+        "Authors": [
+            {
+                "Email": "pedroarthur.jedi@gmail.com",
+                "Name": "Pedro Arthur Duarte (aka JEdi)"
+            }
+        ],
+        "Id": "kwin-liv-tiler",
+        "Version": "1.0",
+        "License": "GPLv3",
+        "Website": "https://github.com/pedroarthur"
+    },
+    "X-Plasma-API": "javascript",
+    "X-Plasma-MainScript": "code/main.js",
+    "KPackageStructure": "KWin/Script"
+}
