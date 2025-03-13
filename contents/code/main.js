@@ -158,13 +158,23 @@ theBottom = (window, screen) => {
   tilings[window] = theBottom;
 }
 
+var wholeScreened = {}
+
 theWholeScreen = (window, screen) => {
+  if (wholeScreened[window]) {
+    return wholeScreened[window](window, screen);
+  }
+
   window.frameGeometry = {
     x: screen.geometry.x,
     y: screen.geometry.y,
     width: screen.geometry.width,
     height: screen.geometry.height
   };
+
+  if (tilings[window]) {
+    wholeScreened = tilings[window];
+  }
 
   tilings[window] = theWholeScreen;
 }
