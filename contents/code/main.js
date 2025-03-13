@@ -7,6 +7,8 @@ tileWindowToTheLeftOfScreen = (window, screen) => {
     width: screen.geometry.width / 2,
     height: screen.geometry.height
   };
+
+  tilings[window] = tileWindowToTheLeftOfScreen;
 }
 
 tileWindowToTheTopLeftOfScreen = (window, screen) => {
@@ -16,6 +18,8 @@ tileWindowToTheTopLeftOfScreen = (window, screen) => {
     width: screen.geometry.width / 2,
     height: screen.geometry.height / 2
   };
+
+  tilings[window] = tileWindowToTheTopLeftOfScreen;
 }
 
 tileWindowToTheBottomLeftOfScreen = (window, screen) => {
@@ -25,6 +29,8 @@ tileWindowToTheBottomLeftOfScreen = (window, screen) => {
     width: screen.geometry.width / 2,
     height: screen.geometry.height / 2
   };
+
+  tilings[window] = tileWindowToTheBottomLeftOfScreen;
 }
 
 tileWindowToTheRightOfScreen = (window, screen) => {
@@ -34,6 +40,8 @@ tileWindowToTheRightOfScreen = (window, screen) => {
     width: screen.geometry.width / 2,
     height: screen.geometry.height
   };
+
+  tilings[window] = tileWindowToTheRightOfScreen;
 }
 
 tileWindownToTheTopRightOfScreen = (window, screen) => {
@@ -43,6 +51,8 @@ tileWindownToTheTopRightOfScreen = (window, screen) => {
     width: screen.geometry.width / 2,
     height: screen.geometry.height / 2
   };
+
+  tilings[window] = tileWindownToTheTopRightOfScreen;
 }
 
 tileWindowToTheBottomRightOfScreen = (window, screen) => {
@@ -52,12 +62,13 @@ tileWindowToTheBottomRightOfScreen = (window, screen) => {
     width: screen.geometry.width / 2,
     height: screen.geometry.height / 2
   };
+
+  tilings[window] = tileWindowToTheBottomRightOfScreen;
 }
 
 wrappingToTheLeft = (leftTiler, rightTiler) => {
   return (window, screen) => {
     if (!tilings[window] || tilings[window] !== leftTiler) {
-      tilings[window] = leftTiler;
       leftTiler(window, screen);
     } else if (screen.geometry.x > 0) {
       let chosen = null;
@@ -87,7 +98,6 @@ wrappingToTheLeft = (leftTiler, rightTiler) => {
 
       if (chosen !== null) {
         print("Moving to screen", chosen.geometry);
-        tilings[window] = rightTiler;
         rightTiler(window, chosen);
       }
     }
@@ -99,7 +109,6 @@ wrappingToTheRight = (leftTiler, rightTiler) => {
     let virtualScreenGeometry = workspace.virtualScreenGeometry;
 
     if (!tilings[window] || tilings[window] !== rightTiler) {
-      tilings[window] = rightTiler;
       rightTiler(window, screen);
     } else if (screen.geometry.x + screen.geometry.width < virtualScreenGeometry.x + virtualScreenGeometry.width) {
       let chosen = null;
@@ -129,7 +138,6 @@ wrappingToTheRight = (leftTiler, rightTiler) => {
 
       if (chosen !== null) {
         print("Moving to screen", chosen.geometry);
-        tilings[window] = leftTiler;
         leftTiler(window, chosen);
       }
     }
@@ -161,7 +169,7 @@ theBottom = (window, screen) => {
 var wholeScreened = {}
 
 theWholeScreen = (window, screen) => {
-  if (wholeScreened[window]) {
+  if (tilings[window] == theWholeScreen && wholeScreened[window]) {
     return wholeScreened[window](window, screen);
   }
 
@@ -172,8 +180,8 @@ theWholeScreen = (window, screen) => {
     height: screen.geometry.height
   };
 
-  if (tilings[window]) {
-    wholeScreened = tilings[window];
+  if (tilings[window] && tilings[window] != theWholeScreen) {
+    wholeScreened[window] = tilings[window];
   }
 
   tilings[window] = theWholeScreen;
