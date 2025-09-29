@@ -1,70 +1,85 @@
+// Set the height of any top and/or bottom panels.
+// Set to zero for no panels.
+// If you have multiple screens, this will apply to All screens
+// regardless of if the panels actually exist on a screen.
+
+var bottomPanelHeight = 45;
+var topPanelHeight = 0;
+var totalPanelHeight = topPanelHeight + bottomPanelHeight;
+
 var tilings = {};
 
 tileWindowToTheLeftOfScreen = (window, screen) => {
   window.frameGeometry = {
     x: screen.geometry.x,
-    y: screen.geometry.y,
+    y: screen.geometry.y + topPanelHeight,
     width: screen.geometry.width / 2,
-    height: screen.geometry.height
+    height: screen.geometry.height - totalPanelHeight,
   };
 
   tilings[window] = tileWindowToTheLeftOfScreen;
-}
+};
 
 tileWindowToTheTopLeftOfScreen = (window, screen) => {
   window.frameGeometry = {
     x: screen.geometry.x,
-    y: screen.geometry.y,
+    y: screen.geometry.y + topPanelHeight,
     width: screen.geometry.width / 2,
-    height: screen.geometry.height / 2
+    height: (screen.geometry.height - totalPanelHeight) / 2,
   };
 
   tilings[window] = tileWindowToTheTopLeftOfScreen;
-}
+};
 
 tileWindowToTheBottomLeftOfScreen = (window, screen) => {
   window.frameGeometry = {
     x: screen.geometry.x,
-    y: screen.geometry.y + screen.geometry.height / 2,
+    y:
+      screen.geometry.y +
+      topPanelHeight +
+      (screen.geometry.height - totalPanelHeight) / 2,
     width: screen.geometry.width / 2,
-    height: screen.geometry.height / 2
+    height: (screen.geometry.height - totalPanelHeight) / 2,
   };
 
   tilings[window] = tileWindowToTheBottomLeftOfScreen;
-}
+};
 
 tileWindowToTheRightOfScreen = (window, screen) => {
   window.frameGeometry = {
     x: screen.geometry.x + screen.geometry.width / 2,
-    y: screen.geometry.y,
+    y: screen.geometry.y + topPanelHeight,
     width: screen.geometry.width / 2,
-    height: screen.geometry.height
+    height: screen.geometry.height - totalPanelHeight,
   };
 
   tilings[window] = tileWindowToTheRightOfScreen;
-}
+};
 
 tileWindownToTheTopRightOfScreen = (window, screen) => {
   window.frameGeometry = {
     x: screen.geometry.x + screen.geometry.width / 2,
-    y: screen.geometry.y,
+    y: screen.geometry.y + topPanelHeight,
     width: screen.geometry.width / 2,
-    height: screen.geometry.height / 2
+    height: (screen.geometry.height - totalPanelHeight) / 2,
   };
 
   tilings[window] = tileWindownToTheTopRightOfScreen;
-}
+};
 
 tileWindowToTheBottomRightOfScreen = (window, screen) => {
   window.frameGeometry = {
     x: screen.geometry.x + screen.geometry.width / 2,
-    y: screen.geometry.y + screen.geometry.height / 2,
+    y:
+      screen.geometry.y +
+      topPanelHeight +
+      (screen.geometry.height - totalPanelHeight) / 2,
     width: screen.geometry.width / 2,
-    height: screen.geometry.height / 2
+    height: (screen.geometry.height - totalPanelHeight) / 2,
   };
 
   tilings[window] = tileWindowToTheBottomRightOfScreen;
-}
+};
 
 wrappingToTheLeft = (leftTiler, rightTiler) => {
   return (window, screen) => {
@@ -80,7 +95,11 @@ wrappingToTheLeft = (leftTiler, rightTiler) => {
         }
 
         if (candidate.geometry.x > screen.geometry.x) {
-          print("Skipping screen", candidate.geometry, "because it is further to the right than the current screen");
+          print(
+            "Skipping screen",
+            candidate.geometry,
+            "because it is further to the right than the current screen",
+          );
           continue;
         }
 
@@ -92,7 +111,13 @@ wrappingToTheLeft = (leftTiler, rightTiler) => {
           continue;
         } else if (candidate.geometry.x > chosen.geometry.x) {
           chosen = candidate;
-          print("Chose", chosen.geometry, "because", candidate.geometry, "is further to the right");
+          print(
+            "Chose",
+            chosen.geometry,
+            "because",
+            candidate.geometry,
+            "is further to the right",
+          );
         }
       }
 
@@ -101,8 +126,8 @@ wrappingToTheLeft = (leftTiler, rightTiler) => {
         rightTiler(window, chosen);
       }
     }
-  }
-}
+  };
+};
 
 wrappingToTheRight = (leftTiler, rightTiler) => {
   return (window, screen) => {
@@ -110,7 +135,10 @@ wrappingToTheRight = (leftTiler, rightTiler) => {
 
     if (!tilings[window] || tilings[window] !== rightTiler) {
       rightTiler(window, screen);
-    } else if (screen.geometry.x + screen.geometry.width < virtualScreenGeometry.x + virtualScreenGeometry.width) {
+    } else if (
+      screen.geometry.x + screen.geometry.width <
+      virtualScreenGeometry.x + virtualScreenGeometry.width
+    ) {
       let chosen = null;
 
       for (const candidate of workspace.screens) {
@@ -119,8 +147,15 @@ wrappingToTheRight = (leftTiler, rightTiler) => {
           continue;
         }
 
-        if (candidate.geometry.x + candidate.geometry.width < screen.geometry.x + screen.geometry.width) {
-          print("Skipping screen", candidate.geometry, "because it is further to the left than the current screen");
+        if (
+          candidate.geometry.x + candidate.geometry.width <
+          screen.geometry.x + screen.geometry.width
+        ) {
+          print(
+            "Skipping screen",
+            candidate.geometry,
+            "because it is further to the left than the current screen",
+          );
           continue;
         }
 
@@ -130,9 +165,18 @@ wrappingToTheRight = (leftTiler, rightTiler) => {
           chosen = candidate;
           print("Chose", chosen.geometry, "because chosen === null");
           continue;
-        } else if (candidate.geometry.x + candidate.geometry.width < chosen.geometry.x + chosen.geometry.width) {
+        } else if (
+          candidate.geometry.x + candidate.geometry.width <
+          chosen.geometry.x + chosen.geometry.width
+        ) {
           chosen = candidate;
-          print("Chose", chosen.geometry, "because", candidate.geometry, "is further to the left");
+          print(
+            "Chose",
+            chosen.geometry,
+            "because",
+            candidate.geometry,
+            "is further to the left",
+          );
         }
       }
 
@@ -141,32 +185,35 @@ wrappingToTheRight = (leftTiler, rightTiler) => {
         leftTiler(window, chosen);
       }
     }
-  }
-}
+  };
+};
 
 theTop = (window, screen) => {
   window.frameGeometry = {
     x: screen.geometry.x,
-    y: screen.geometry.y,
+    y: screen.geometry.y + topPanelHeight,
     width: screen.geometry.width,
-    height: screen.geometry.height / 2
+    height: (screen.geometry.height - totalPanelHeight) / 2,
   };
 
   tilings[window] = theTop;
-}
+};
 
 theBottom = (window, screen) => {
   window.frameGeometry = {
     x: screen.geometry.x,
-    y: screen.geometry.y + screen.geometry.height / 2,
+    y:
+      screen.geometry.y +
+      topPanelHeight +
+      (screen.geometry.height - totalPanelHeight) / 2,
     width: screen.geometry.width,
-    height: screen.geometry.height / 2
+    height: (screen.geometry.height - totalPanelHeight) / 2,
   };
 
   tilings[window] = theBottom;
-}
+};
 
-var wholeScreened = {}
+var wholeScreened = {};
 
 theWholeScreen = (window, screen) => {
   if (tilings[window] == theWholeScreen && wholeScreened[window]) {
@@ -175,9 +222,9 @@ theWholeScreen = (window, screen) => {
 
   window.frameGeometry = {
     x: screen.geometry.x,
-    y: screen.geometry.y,
+    y: screen.geometry.y + topPanelHeight,
     width: screen.geometry.width,
-    height: screen.geometry.height
+    height: screen.geometry.height - totalPanelHeight,
   };
 
   if (tilings[window] && tilings[window] != theWholeScreen) {
@@ -185,7 +232,7 @@ theWholeScreen = (window, screen) => {
   }
 
   tilings[window] = theWholeScreen;
-}
+};
 
 setUp = (window) => {
   window.setMaximize(false, false);
@@ -195,9 +242,9 @@ setUp = (window) => {
     window.closed.connect(() => {
       print("Window", window, "closed, deleting tiling data");
       delete tilings[window];
-    })
+    });
   }
-}
+};
 
 tileWindowTo = (pos, tiler) => {
   return () => {
@@ -214,17 +261,41 @@ tileWindowTo = (pos, tiler) => {
     setUp(window);
     tiler(window, screen);
   };
-}
+};
 
-register = (direction, shortcut, tiler) => registerShortcut("Really Tile Window to the " + direction, "", shortcut, tileWindowTo(direction, tiler));
+register = (direction, shortcut, tiler) =>
+  registerShortcut(
+    "Really Tile Window to the " + direction,
+    "",
+    shortcut,
+    tileWindowTo(direction, tiler),
+  );
 
-theLeft = wrappingToTheLeft(tileWindowToTheLeftOfScreen, tileWindowToTheRightOfScreen);
-theTopLeft = wrappingToTheLeft(tileWindowToTheTopLeftOfScreen, tileWindownToTheTopRightOfScreen);
-theBottomLeft = wrappingToTheLeft(tileWindowToTheBottomLeftOfScreen, tileWindowToTheBottomRightOfScreen);
+theLeft = wrappingToTheLeft(
+  tileWindowToTheLeftOfScreen,
+  tileWindowToTheRightOfScreen,
+);
+theTopLeft = wrappingToTheLeft(
+  tileWindowToTheTopLeftOfScreen,
+  tileWindownToTheTopRightOfScreen,
+);
+theBottomLeft = wrappingToTheLeft(
+  tileWindowToTheBottomLeftOfScreen,
+  tileWindowToTheBottomRightOfScreen,
+);
 
-theRight = wrappingToTheRight(tileWindowToTheLeftOfScreen, tileWindowToTheRightOfScreen);
-theTopRight = wrappingToTheRight(tileWindowToTheTopLeftOfScreen, tileWindownToTheTopRightOfScreen);
-theBottomRight = wrappingToTheRight(tileWindowToTheBottomLeftOfScreen, tileWindowToTheBottomRightOfScreen);
+theRight = wrappingToTheRight(
+  tileWindowToTheLeftOfScreen,
+  tileWindowToTheRightOfScreen,
+);
+theTopRight = wrappingToTheRight(
+  tileWindowToTheTopLeftOfScreen,
+  tileWindownToTheTopRightOfScreen,
+);
+theBottomRight = wrappingToTheRight(
+  tileWindowToTheBottomLeftOfScreen,
+  tileWindowToTheBottomRightOfScreen,
+);
 
 register("Whole Screen", "Meta+Shift+i", theWholeScreen);
 
