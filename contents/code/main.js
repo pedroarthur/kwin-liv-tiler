@@ -1,67 +1,85 @@
 var tilings = {};
+let windowGap = 1;
+
+function setWindowGeometry(window, {x, y, width, height}) {
+  window.frameGeometry = {
+    x: x + windowGap,
+    y: y + windowGap,
+    width: width - 2 * windowGap,
+    height: height - 2 * windowGap
+  };
+}
+
+function adjustWindowGap(delta) {
+  const previousGap = windowGap;
+  windowGap = Math.max(0, windowGap + delta);
+  if (windowGap !== previousGap) {
+    print("Window gap:", windowGap);
+  }
+}
 
 tileWindowToTheLeftOfScreen = (window, screen, area, quadWidth, quadHeight) => {
-  window.frameGeometry = {
+  setWindowGeometry(window, {
     x: area.x,
     y: area.y,
     width: quadWidth / 2,
     height: quadHeight
-  };
+  });
 
   tilings[window] = tileWindowToTheLeftOfScreen;
 }
 
 tileWindowToTheTopLeftOfScreen = (window, screen, area, quadWidth, quadHeight) => {
-  window.frameGeometry = {
+  setWindowGeometry(window, {
     x: area.x,
     y: area.y,
     width: quadWidth / 2,
     height: quadHeight / 2
-  };
+  });
 
   tilings[window] = tileWindowToTheTopLeftOfScreen;
 }
 
 tileWindowToTheBottomLeftOfScreen = (window, screen, area, quadWidth, quadHeight) => {
-  window.frameGeometry = {
+  setWindowGeometry(window, {
     x: area.x,
     y: area.y + quadHeight / 2,
     width: quadWidth / 2,
     height: quadHeight / 2
-  };
+  });
 
   tilings[window] = tileWindowToTheBottomLeftOfScreen;
 }
 
 tileWindowToTheRightOfScreen = (window, screen, area, quadWidth, quadHeight) => {
-  window.frameGeometry = {
+  setWindowGeometry(window, {
     x: area.x + quadWidth / 2,
     y: area.y,
     width: quadWidth / 2,
     height: quadHeight
-  };
+  });
 
   tilings[window] = tileWindowToTheRightOfScreen;
 }
 
 tileWindownToTheTopRightOfScreen = (window, screen, area, quadWidth, quadHeight) => {
-  window.frameGeometry = {
+  setWindowGeometry(window, {
     x: area.x + quadWidth / 2,
     y: area.y,
     width: quadWidth / 2,
     height: quadHeight / 2
-  };
+  });
 
   tilings[window] = tileWindownToTheTopRightOfScreen;
 }
 
 tileWindowToTheBottomRightOfScreen = (window, screen, area, quadWidth, quadHeight) => {
-  window.frameGeometry = {
+  setWindowGeometry(window, {
     x: area.x + quadWidth / 2,
     y: area.y + quadHeight / 2,
     width: quadWidth / 2,
     height: quadHeight / 2
-  };
+  });
 
   tilings[window] = tileWindowToTheBottomRightOfScreen;
 }
@@ -151,23 +169,23 @@ wrappingToTheRight = (leftTiler, rightTiler) => {
 };
 
 theTop = (window, screen, area, quadWidth, quadHeight) => {
-  window.frameGeometry = {
+  setWindowGeometry(window, {
     x: area.x,
     y: area.y,
     width: quadWidth,
     height: quadHeight / 2
-  };
+  });
 
   tilings[window] = theTop;
 }
 
 theBottom = (window, screen, area, quadWidth, quadHeight) => {
-  window.frameGeometry = {
+  setWindowGeometry(window, {
     x: area.x,
     y: area.y + quadHeight / 2,
     width: quadWidth,
     height: quadHeight / 2
-  };
+  });
 
   tilings[window] = theBottom;
 }
@@ -179,12 +197,12 @@ theWholeRealState = (window, screen, area, quadWidth, quadHeight) => {
     return wholeScreened[window](window, screen, area, quadWidth, quadHeight);
   }
 
-  window.frameGeometry = {
+  setWindowGeometry(window, {
     x: area.x,
     y: area.y,
     width: quadWidth,
     height: quadHeight
-  };
+  });
 
   if (tilings[window] && tilings[window] != theWholeRealState) {
     wholeScreened[window] = tilings[window];
@@ -198,12 +216,12 @@ theWholeScreen = (window, screen, area, quadWidth, quadHeight) => {
     return wholeScreened[window](window, screen, area, quadWidth, quadHeight);
   }
 
-  window.frameGeometry = {
+  setWindowGeometry(window, {
     x: area.x,
     y: area.y,
     width: quadWidth,
     height: quadHeight
-  };
+  });
 
   if (tilings[window] && tilings[window] != theWholeScreen) {
     wholeScreened[window] = tilings[window];
@@ -244,7 +262,7 @@ tileWindowTo = (pos, tiler, areaSource) => {
 }
 
 realStateArea = () => {
-  return workspace.virtualScreenSize;
+  return workspace.virtualScreenGeometry;
 }
 
 register = (direction, shortcut, tiler, areaSource) => registerShortcut("Really Tile Window to the " + direction, "", shortcut, tileWindowTo(direction, tiler, areaSource));
@@ -270,5 +288,8 @@ register("Bottom Right", "Meta+Shift+m", theBottomRight);
 
 register("Top", "Meta+Shift+k", theTop);
 register("Bottom", "Meta+Shift+j", theBottom);
+
+registerShortcut("Increase Window Gap", "Increase Window Gap", "Meta+Ctrl+Alt++", () => adjustWindowGap(1));
+registerShortcut("Decrease Window Gap", "Decrease Window Gap", "Meta+Ctrl+Alt+_", () => adjustWindowGap(-1));
 
 print("kwin-liv-tiler is ready");
