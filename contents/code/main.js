@@ -174,6 +174,25 @@ theBottom = (window, screen, area, quadWidth, quadHeight) => {
 
 var wholeScreened = {}
 
+theWholeRealState = (window, screen, area, quadWidth, quadHeight) => {
+  if (tilings[window] == theWholeRealState && wholeScreened[window]) {
+    return wholeScreened[window](window, screen, area, quadWidth, quadHeight);
+  }
+
+  window.frameGeometry = {
+    x: area.x,
+    y: area.y,
+    width: quadWidth,
+    height: quadHeight
+  };
+
+  if (tilings[window] && tilings[window] != theWholeRealState) {
+    wholeScreened[window] = tilings[window];
+  }
+
+  tilings[window] = theWholeRealState;
+}
+
 theWholeScreen = (window, screen, area, quadWidth, quadHeight) => {
   if (tilings[window] == theWholeScreen && wholeScreened[window]) {
     return wholeScreened[window](window, screen, area, quadWidth, quadHeight);
@@ -205,13 +224,13 @@ setUp = (window) => {
   }
 }
 
-tileWindowTo = (pos, tiler) => {
+tileWindowTo = (pos, tiler, areaSource) => {
   return () => {
     print("Really Tile Window to the", pos);
 
     let window = workspace.activeWindow;
     let screen = window.output;
-    let area = workspace.clientArea(KWin.MaximizeArea, window);
+    let area = areaSource ? areaSource() : workspace.clientArea(KWin.MaximizeArea, window);
     let quadWidth = area.width;
     let quadHeight = area.height;
     if (window.desktopWindow) {
@@ -224,7 +243,11 @@ tileWindowTo = (pos, tiler) => {
   };
 }
 
-register = (direction, shortcut, tiler) => registerShortcut("Really Tile Window to the " + direction, "", shortcut, tileWindowTo(direction, tiler));
+realStateArea = () => {
+  return workspace.virtualScreenSize;
+}
+
+register = (direction, shortcut, tiler, areaSource) => registerShortcut("Really Tile Window to the " + direction, "", shortcut, tileWindowTo(direction, tiler, areaSource));
 
 theLeft = wrappingToTheLeft(tileWindowToTheLeftOfScreen, tileWindowToTheRightOfScreen);
 theTopLeft = wrappingToTheLeft(tileWindowToTheTopLeftOfScreen, tileWindownToTheTopRightOfScreen);
@@ -235,6 +258,7 @@ theTopRight = wrappingToTheRight(tileWindowToTheTopLeftOfScreen, tileWindownToTh
 theBottomRight = wrappingToTheRight(tileWindowToTheBottomLeftOfScreen, tileWindowToTheBottomRightOfScreen);
 
 register("Whole Screen", "Meta+Shift+i", theWholeScreen);
+register("Whole Real State", "Meta+Shift+Alt+i", theWholeRealState, realStateArea);
 
 register("Left", "Meta+Shift+h", theLeft);
 register("Top Left", "Meta+Shift+u", theTopLeft);
