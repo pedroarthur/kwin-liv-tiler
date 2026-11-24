@@ -1,0 +1,4 @@
+# Ignore codex stuff
+node_modules/
+package.json
+package-lock.json
